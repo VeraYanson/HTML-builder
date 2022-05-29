@@ -1,29 +1,21 @@
+const { resolve } = require('path');
 const fs = require('fs');
-const path = require ('path')
-const process = require('process');
-const readline = require('readline')
 
-const { stdin: input, stdout: output } = require('process');
-const { text } = require('stream/consumers');
+const writeStream = fs.createWriteStream(resolve(__dirname, 'text.txt'));
+const { stdout, stdin } = process;
 
-function createFile(){
-    fs.open('text.txt', 'a', (err) => {
-    if(err) throw err;
-    });
-}
-createFile()
 
-fs.createWriteStream("text.txt")
-
-const rl = readline.createInterface({ input, output });
-rl.question('Пожалуйста, введите текст: ', (text) => {
-  
+stdout.write('Write a message...\n');
+stdin.on('data', (data) => {
+  if (data.toString().trim() === 'exit') {
+    process.exit();
+  }
+  writeStream.write(data);
 });
 
-
-
-
- fs.appendFile('text.txt', "text", (err) => {
-           if(err) throw err;
-    })
-
+process.on('SIGINT', () => {
+  process.exit();
+});
+process.on('exit', () => {
+  stdout.write('\n' + 'Bye!');
+});
